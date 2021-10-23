@@ -1,0 +1,15 @@
+#!/bin/bash
+case $1 in
+
+  A)
+    echo -n "10.10.1.1"
+    ;;
+
+  AAAA)
+    echo -n "2a00:1450:4009:823::200e"
+    ;;
+
+  *)
+    echo -n "unknown"
+    ;;
+esac
