@@ -22,13 +22,15 @@ func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 		return 0, nil
 	}
 
+	m := new(dns.Msg)
+	m.SetReply(r)
+
 	qname := r.Question[0].Name
 	qtype := r.Question[0].Qtype
 	class := r.Question[0].Qclass
 
 	if qtype != dns.TypeA && qtype != dns.TypeAAAA {
 		//response with nxdomain
-		m := new(dns.Msg)
 		m.SetRcode(m, dns.RcodeNameError)
 		w.WriteMsg(m)
 		return 0, nil
@@ -39,7 +41,6 @@ func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 
 	if err != nil {
 		//response with nxdomain
-		m := new(dns.Msg)
 		m.SetRcode(m, dns.RcodeNameError)
 		w.WriteMsg(m)
 		return 0, nil
@@ -51,14 +52,12 @@ func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 
 	if ip == nil {
 		//response with nxdomain
-		m := new(dns.Msg)
 		m.SetRcode(m, dns.RcodeNameError)
 		w.WriteMsg(m)
 		return 0, nil
 	}
 
 	var rr dns.RR
-	ans := new(dns.Msg)
 
 	if qtype == dns.TypeA {
 		rr = new(dns.A)
@@ -73,9 +72,9 @@ func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 	}
 
 	//add the answer
-	ans.Answer = append(ans.Answer, rr)
+	m.Answer = append(m.Answer, rr)
 
-	w.WriteMsg(ans)
+	w.WriteMsg(m)
 
 	return 0, nil
 }
