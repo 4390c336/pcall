@@ -48,8 +48,8 @@ func TestPcall(t *testing.T) {
 		{
 			Expected: dns.RcodeSuccess,
 			test: test.Case{
-				Answer: []dns.RR{test.AAAA("linux.example.org. 0 IN AAAA 2a00:1450:4009:823::200e")},
-				Qname:  "linux.example.org.",
+				Answer: []dns.RR{test.AAAA("linux6.example.org. 0 IN AAAA 2a00:1450:4009:823::200e")},
+				Qname:  "linux6.example.org.",
 				Qtype:  dns.TypeAAAA,
 			},
 		},
@@ -59,6 +59,14 @@ func TestPcall(t *testing.T) {
 				Answer: []dns.RR{test.MX("example.org. 585 IN MX 50 mx01.example.org.")},
 				Qname:  "linux.example.org.",
 				Qtype:  dns.TypeMX,
+			},
+		},
+		{
+			Expected: dns.RcodeNameError,
+			test: test.Case{
+				Answer: []dns.RR{test.A("not-found.example.org. 0 IN A 10.10.1.1")},
+				Qname:  "not-found.example.org.",
+				Qtype:  dns.TypeA,
 			},
 		},
 	}

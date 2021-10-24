@@ -2,7 +2,6 @@ package pcall
 
 import (
 	"context"
-	"log"
 	"net"
 	"os/exec"
 	"strings"
@@ -20,7 +19,6 @@ type Pcall struct {
 func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (int, error) {
 
 	if len(r.Question) > 1 {
-		log.Println("multiple questions not supported")
 		return 0, nil
 	}
 
@@ -29,8 +27,6 @@ func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 	class := r.Question[0].Qclass
 
 	if qtype != dns.TypeA && qtype != dns.TypeAAAA {
-		log.Println("not supported:", "QType", dns.TypeToString[qtype])
-
 		//response with nxdomain
 		m := new(dns.Msg)
 		m.SetRcode(m, dns.RcodeNameError)
@@ -42,7 +38,6 @@ func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 	stdout, err := cmd.Output()
 
 	if err != nil {
-		log.Fatalln("command err", p.CommandPath, err)
 		//response with nxdomain
 		m := new(dns.Msg)
 		m.SetRcode(m, dns.RcodeNameError)
@@ -52,9 +47,15 @@ func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 
 	//@TODO: support multiple answers
 
-	ip := net.ParseIP(strings.Trim(string(stdout), "\n\t ")) // can this guy fail ?
+	ip := net.ParseIP(strings.Trim(string(stdout), "\n\t "))
 
-	log.Println("resolved Qname:", qname, "QType:", dns.TypeToString[qtype], "ip:", ip)
+	if ip == nil {
+		//response with nxdomain
+		m := new(dns.Msg)
+		m.SetRcode(m, dns.RcodeNameError)
+		w.WriteMsg(m)
+		return 0, nil
+	}
 
 	var rr dns.RR
 	ans := new(dns.Msg)

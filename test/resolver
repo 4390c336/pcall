@@ -1,15 +1,16 @@
 #!/bin/bash
-case $1 in
+case $2 in
 
-  A)
+  linux.example.org.)
     echo -n "10.10.1.1"
     ;;
 
-  AAAA)
+  linux6.example.org.)
     echo -n "2a00:1450:4009:823::200e"
     ;;
 
   *)
     echo -n "unknown"
+    exit 64
     ;;
 esac

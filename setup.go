@@ -1,8 +1,6 @@
 package pcall
 
 import (
-	"log"
-
 	"github.com/coredns/caddy"
 	"github.com/coredns/coredns/core/dnsserver"
 	"github.com/coredns/coredns/plugin"
@@ -28,6 +26,11 @@ func setup(c *caddy.Controller) error {
 func parse(c *caddy.Controller) (string, error) {
 	var commandPath string
 
+	/*
+		@TODO: check file/dir perm if safe or not
+		@TODO: check if the binary exists or not
+	*/
+
 	for c.Next() {
 
 		for c.NextBlock() {
@@ -37,7 +40,6 @@ func parse(c *caddy.Controller) (string, error) {
 			commandPath = c.RemainingArgs()[0]
 		}
 	}
-	log.Println("commandPath:", commandPath)
 
 	return commandPath, nil
 }
