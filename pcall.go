@@ -31,7 +31,7 @@ func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 
 	if qtype != dns.TypeA && qtype != dns.TypeAAAA {
 		//response with nxdomain
-		m.SetRcode(m, dns.RcodeNameError)
+		m.SetRcode(r, dns.RcodeNameError)
 		w.WriteMsg(m)
 		return dns.RcodeNameError, nil
 	}
@@ -42,7 +42,7 @@ func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 	if err != nil {
 		//response with nxdomain
 		m := new(dns.Msg)
-		m.SetRcode(m, dns.RcodeNameError)
+		m.SetRcode(r, dns.RcodeNameError)
 		w.WriteMsg(m)
 		return dns.RcodeNameError, nil
 	}
@@ -53,7 +53,7 @@ func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 
 	if ip == nil {
 		//response with nxdomain
-		m.SetRcode(m, dns.RcodeNameError)
+		m.SetRcode(r, dns.RcodeNameError)
 		w.WriteMsg(m)
 		return dns.RcodeNameError, nil
 	}
