@@ -35,7 +35,7 @@ func (t *testHandler) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns
 	return 0, nil
 }
 
-func TestBlockingResponse(t *testing.T) {
+func TestPcall(t *testing.T) {
 	var tests = []testcase{
 		{
 			Expected: dns.RcodeSuccess,
@@ -53,6 +53,14 @@ func TestBlockingResponse(t *testing.T) {
 				Qtype:  dns.TypeAAAA,
 			},
 		},
+		{
+			Expected: dns.RcodeNameError,
+			test: test.Case{
+				Answer: []dns.RR{test.MX("example.org. 585 IN MX 50 mx01.example.org.")},
+				Qname:  "linux.example.org.",
+				Qtype:  dns.TypeMX,
+			},
+		},
 	}
 
 	for _, tc := range tests {
@@ -67,7 +75,12 @@ func TestBlockingResponse(t *testing.T) {
 		o := &Pcall{Next: tHandler}
 		w := dnstest.NewRecorder(&test.ResponseWriter{})
 
-		o.CommandPath = "./test/resolver"
+		//default value for the binary
+		if tc.config == "" {
+			o.CommandPath = "./test/resolver"
+		} else {
+			o.CommandPath = tc.config
+		}
 
 		_, err := o.ServeDNS(context.TODO(), w, m)
 
@@ -75,8 +88,18 @@ func TestBlockingResponse(t *testing.T) {
 			t.Errorf("Error %q", err)
 		}
 
-		if w.Rcode != tc.Expected || tc.test.Answer[0].String() != w.Msg.Answer[0].String() {
+		if w.Rcode != tc.Expected {
+			t.Fatal("Expected:", tc.Expected, "Got:", w.Rcode)
+		}
+
+		//nothing to check if nxdomain
+		if tc.Expected == dns.RcodeNameError {
+			continue
+		}
+
+		if tc.test.Answer[0].String() != w.Msg.Answer[0].String() {
 			t.Error("Expected:", tc.test.Answer[0], "Got:", w.Msg.Answer[0], "Rcode:", w.Rcode)
 		}
+
 	}
 }
