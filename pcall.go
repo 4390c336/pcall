@@ -33,7 +33,7 @@ func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 		//response with nxdomain
 		m.SetRcode(m, dns.RcodeNameError)
 		w.WriteMsg(m)
-		return 0, nil
+		return dns.RcodeNameError, nil
 	}
 
 	cmd := exec.Command(p.CommandPath, dns.TypeToString[qtype], qname)
@@ -43,7 +43,7 @@ func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 		//response with nxdomain
 		m.SetRcode(m, dns.RcodeNameError)
 		w.WriteMsg(m)
-		return 0, nil
+		return dns.RcodeNameError, nil
 	}
 
 	//@TODO: support multiple answers
@@ -54,7 +54,7 @@ func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 		//response with nxdomain
 		m.SetRcode(m, dns.RcodeNameError)
 		w.WriteMsg(m)
-		return 0, nil
+		return dns.RcodeNameError, nil
 	}
 
 	var rr dns.RR
