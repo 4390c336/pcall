@@ -80,4 +80,4 @@ func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 }
 
 // Name implements the Handler interface.
-func (a Pcall) Name() string { return "pcall" }
+func (p Pcall) Name() string { return "pcall" }
