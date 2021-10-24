@@ -41,6 +41,7 @@ func (p Pcall) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (
 
 	if err != nil {
 		//response with nxdomain
+		m := new(dns.Msg)
 		m.SetRcode(m, dns.RcodeNameError)
 		w.WriteMsg(m)
 		return dns.RcodeNameError, nil
